@@ -6,33 +6,22 @@
 void swap(int *a, int *b);
 int iabs(int a);
 void line (tgaImage *image, int x0, int y0, int x1, int y1, tgaColor color);
+int sign(int a);
 void meshgrid(tgaImage *image, Model *model);
 
 int main(int argc, char **argv){
     int rv = 0;
-
-    if (argc < 2) {
+    if (argc < 3) {
         fprintf(stderr, "Usage: %s outfile\n", argv[0]);
         return -1;
     }
+    Model *model = loadFromObj(argv[2]);
 
-	Model *model = loadFromObj(argv[1]);
-
-	int width = 800;
-	int height = 800;
-	tgaImage * image = tgaNewImage(height, width, RGB);
-
-	meshgrid(image, model);
-
-    /*int i;
-    tgaColor white = tgaRGB(255, 255, 255);
-    tgaColor red = tgaRGB(255, 0, 0);
-    tgaColor blue = tgaRGB(0, 0, 255);
-    for (i = 0; i < 1000000; ++i) {
-        line(image, 13, 20, 90, 40, white);
-        line(image, 20, 13, 40, 80, red);
-        line(image, 80, 40, 13, 20, blue);
-    }*/
+    int height = 800;
+    int width = 800;
+    tgaImage * image = tgaNewImage(height, width, RGB);
+    
+    meshgrid(image, model);
 
     if (-1 == tgaSaveToFile(image, argv[1])) {
         perror("tgaSateToFile");
@@ -40,7 +29,7 @@ int main(int argc, char **argv){
     }
 
     tgaFreeImage(image);
-	freeModel(model);
+    freeModel(model);    
     return rv;
 }
 
@@ -51,22 +40,42 @@ void line (tgaImage *image, int x0, int y0, int x1, int y1, tgaColor color){
         swap(&x0, &y0);
         swap(&x1, &y1);
     }
-
     if (x0 > x1) {
         swap(&x0, &x1);
         swap(&y0, &y1);
     }
-
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int de = 2 * iabs(dy);
+    int e = 0;
+    int y = y0;
     int x;
-    double y;
-    double k = ((double)(y1 - y0))/(x1 - x0);
-    for (x = x0, y = y0; x <= x1; ++x, y += k) {
-        if (steep) {
+    for (x = x0; x <= x1; ++x){
+         if (steep == 1) {
             tgaSetPixel(image, (unsigned int)y, (unsigned int)x, color);
-        } else {
-            tgaSetPixel(image, (unsigned int)x, (unsigned int)y, color);
-        }
-    }
+         } else {
+            tgaSetPixel(image, (unsigned int)x, (unsigned int)y, color);  
+         }
+         e = e + de;
+         if (e > dx){
+            y = y + sign(dy);
+            e = e - 2 * dx;
+         }
+    } 
+}
+
+int sign(int a){
+   int b;
+   if (a > 0) {
+      b = 1;
+   }
+   if (a == 0) {
+      b = 0;
+   }
+   if (a < 0) {
+      b = -1;
+   }
+   return b;
 }
 
 void swap(int *a, int *b) {
@@ -78,7 +87,6 @@ void swap(int *a, int *b) {
 int iabs(int a) {
     return (a >= 0) ? a : -a;
 }
-
 void meshgrid(tgaImage *image, Model *model) {
 	int i, j;
 	tgaColor white = tgaRGB(255, 255, 255);
@@ -94,4 +102,3 @@ void meshgrid(tgaImage *image, Model *model) {
 		}
 	}
 }
-
