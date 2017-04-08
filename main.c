@@ -12,8 +12,6 @@ void triangle(int coords[3][3], tgaColor color, tgaImage *image);
 void normal(double coords[3][3], Vec3* n);
 double intensity(Vec3 light, Vec3 n);
 void meshgrid_2(tgaImage *image, Model *model);
-void z_triangle(int coords[3][3], tgaColor color, tgaImage *image, int height, int width, int zbuffer[width][height]);
-void meshgrid_3(tgaImage *image, Model *model, int height, int width);
 
 int main(int argc, char **argv){
     int rv = 0;
@@ -221,55 +219,6 @@ void meshgrid_2(tgaImage *image, Model *model) {
             }
             tgaColor color = tgaRGB(I * 255, I * 255, I * 255);
             triangle(screen_coords, color, image);         
-        }
-    }
-}
-
-//перевести z  в экранные координаты: screen_z = (z + 1)*127
-
-void z_triangle(int coords[3][3], tgaColor color, tgaImage *image, int height, int width, int zbuffer[width][height]){
-    int i, j;
-    for (i = 0; i < 3; i++){
-        for (j = 2; j > i; j--){
-           if (coords[j - 1][1] > coords[j][1]){
-              swap(&coords[j - 1][0], &coords[j][0]);
-              swap(&coords[j - 1][1], &coords[j][1]);
-              swap(&coords[j - 1][2], &coords[j][2]);  
-           }
-        }
-    }
-}
-
-void meshgrid_3(tgaImage *image, Model *model, int height, int width) {
-	int i, j;
-    Vec3 light = {0, 0, -1};
-    int zbuffer[width][height];
-    for (i = 0; i < width; ++i){
-        for (j = 0; j < height; ++j){
-            zbuffer[i][j] = 0;
-        }
-    }
-	for (i = 0; i < model->nface; ++i) {
-        double coords[3][3];
-		for (j = 0; j < 3; ++j) {
-			Vec3 *v = &(model->vertices[model->faces[i][3 * j]]);            
-            coords[j][0] = (*v)[0];
-			coords[j][1] = (*v)[1];
-            coords[j][2] = (*v)[2];       
-		}        
-        Vec3 n;
-        normal(coords, &n);
-        double I = intensity(light, n);
-        if (I < 0){
-            I = (-1) * I;
-            int screen_coords[3][3];
- 		    for (j = 0; j < 3; ++j){
-                  screen_coords[j][0] = (coords[j][0] + 1) * image->width / 2;
-			      screen_coords[j][1] = (1 - coords[j][1]) * image->height / 2;
-                  screen_coords[j][2] = (coords[j][2] + 1) * 127;    
-            }
-            tgaColor color = tgaRGB(I * 255, I * 255, I * 255);
-            z_triangle(screen_coords, color, image, zbuffer);         
         }
     }
 }
