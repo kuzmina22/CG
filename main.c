@@ -241,15 +241,15 @@ void meshgrid_3(tgaImage *image, Model *model) {
         	normal(coords, &n);
         	double I = intensity(light, n);
         	if (I < 0){
-            	I = (-1) * I;
-            	int screen_coords[3][3];
- 		for (j = 0; j < 3; ++j){
-                	screen_coords[j][0] = (coords[j][0] + 1) * image->width / 2;
-			screen_coords[j][1] = (1 - coords[j][1]) * image->height / 2;
-                        screen_coords[j][2] = (coords[j][2] + 1) * 127.5;    
-            	}
-            	tgaColor color = tgaRGB(I * 255, I * 255, I * 255);
-            	z_triangle(screen_coords, color, image, &zbuffer);         
-        }
-    }
+            		I = (-1) * I;
+            		int screen_coords[3][3];
+ 			for (j = 0; j < 3; ++j){
+                		screen_coords[j][0] = (coords[j][0] + 1) * image->width / 2;
+				screen_coords[j][1] = (1 - coords[j][1]) * image->height / 2;
+                        	screen_coords[j][2] = (coords[j][2] + 1) * 127.5;    
+            		}
+            		tgaColor color = tgaRGB(I * 255, I * 255, I * 255);
+            		z_triangle(screen_coords, color, image, &zbuffer);         
+        	}
+    	}
 }
