@@ -212,8 +212,8 @@ void z_triangle(int coords[3][3], tgaColor color, tgaImage *image, int (*zbuffer
         for (int x = xa; x <= xb; x++) {
             float gamma = xa == xb ? 1.0 : (float)(x - xa)/(float)(xb - xa);
             int z = (float)za + (float)(zb - za)*gamma;
-            if (z > (*zbuffer)[x][y]){
-                (*zbuffer)[x][y] = z;
+            if (z > (*zbuffer)[x][coords[0][1] + y]){
+                (*zbuffer)[x][coords[0][1] + y] = z;
                 tgaSetPixel(image, (unsigned int)x, (unsigned int)coords[0][1] + y, color);
             }
         }
