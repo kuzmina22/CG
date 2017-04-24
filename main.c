@@ -149,9 +149,9 @@ void normal(double coords[3][3], Vec3* n){
 }
 
 double intensity(Vec3 light, Vec3 n){
-    double I;
+    double I = 0.0;
     for (int i = 0; i < 3; ++i){
-        I = light[i] * n[i];
+        I = I + light[i] * n[i];
     }
     return I;
 }
